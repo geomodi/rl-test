@@ -1,0 +1,17 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "python start_server.py"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[[build.env]]
+NIXPACKS_PYTHON_VERSION = "3.12"
+
+[env]
+FLASK_ENV = "production"
+SERVER_MODE = "production"
+PORT = "8000"
