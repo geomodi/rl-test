@@ -63,10 +63,15 @@ def start_production_server():
             from server import app
 
             # Start Waitress server
+            # Use Railway's PORT environment variable or default to 8000
+            port = int(os.getenv('PORT', 8000))
+            host = '0.0.0.0'  # Railway requires binding to 0.0.0.0
+
+            print(f"🚀 Starting Waitress server on {host}:{port}")
             serve(
                 app,
-                host='127.0.0.1',
-                port=8000,
+                host=host,
+                port=port,
                 threads=4,                      # 4 threads for handling requests
                 connection_limit=100,           # Max 100 concurrent connections
                 cleanup_interval=30,            # Clean up connections every 30s
@@ -85,15 +90,19 @@ def start_production_server():
         # Use Gunicorn on Unix/Linux systems
         try:
             import gunicorn
-            print("[STARTUP] Starting production server with Gunicorn (Unix/Linux)...")
-            print("[SERVER] Server will be available at http://localhost:8000")
+            # Use Railway's PORT environment variable or default to 8000
+            port = int(os.getenv('PORT', 8000))
+            bind_address = f"0.0.0.0:{port}"
+
+            print(f"[STARTUP] Starting production server with Gunicorn (Unix/Linux)...")
+            print(f"[SERVER] Server will be available on {bind_address}")
             print("[SECURITY] Production-ready with proper security and performance")
 
             # Gunicorn configuration
             cmd = [
                 "gunicorn",
                 "--workers", "2",                    # 2 worker processes
-                "--bind", "127.0.0.1:8000",         # Bind to localhost:8000
+                "--bind", bind_address,              # Bind to Railway's expected address
                 "--timeout", "60",                  # 60 second timeout
                 "--keep-alive", "5",                # Keep connections alive
                 "--max-requests", "1000",           # Restart workers after 1000 requests
